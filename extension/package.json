@@ -1,0 +1,91 @@
+{
+  "name": "claude-input-watcher",
+  "displayName": "Claude Input Watcher",
+  "description": "Pauses media and brings Antigravity to focus when Claude Code requires input",
+  "version": "1.0.0",
+  "publisher": "jethro",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "claudeWatcher.enable",
+        "title": "Claude Watcher: Enable"
+      },
+      {
+        "command": "claudeWatcher.disable",
+        "title": "Claude Watcher: Disable"
+      },
+      {
+        "command": "claudeWatcher.toggle",
+        "title": "Claude Watcher: Toggle"
+      },
+      {
+        "command": "claudeWatcher.testPause",
+        "title": "Claude Watcher: Test Pause & Focus"
+      },
+      {
+        "command": "claudeWatcher.testResume",
+        "title": "Claude Watcher: Test Resume"
+      },
+      {
+        "command": "claudeWatcher.showLogs",
+        "title": "Claude Watcher: Show Logs"
+      },
+      {
+        "command": "claudeWatcher.debugState",
+        "title": "Claude Watcher: Debug State"
+      }
+    ],
+    "configuration": {
+      "title": "Claude Input Watcher",
+      "properties": {
+        "claudeWatcher.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable the Claude input watcher"
+        },
+        "claudeWatcher.pauseMedia": {
+          "type": "boolean",
+          "default": true,
+          "description": "Pause media playback when Claude requires input"
+        },
+        "claudeWatcher.playSound": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play notification sound when Claude requires input"
+        },
+        "claudeWatcher.debounceMs": {
+          "type": "number",
+          "default": 500,
+          "description": "Debounce time in milliseconds to prevent rapid triggers"
+        },
+        "claudeWatcher.scriptsPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to PowerShell scripts folder (auto-detected if empty)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}
