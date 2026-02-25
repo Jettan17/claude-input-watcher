@@ -29,7 +29,7 @@ When Claude finishes processing:
 
 ```powershell
 # Navigate to the extension folder
-cd C:\Users\Jethro\Scripts\claude-input-watcher
+cd \claude-input-watcher
 
 # Run the installer
 .\install.ps1
@@ -38,7 +38,7 @@ cd C:\Users\Jethro\Scripts\claude-input-watcher
 ### Manual Install
 
 ```powershell
-cd C:\Users\Jethro\Scripts\claude-input-watcher\extension
+cd \claude-input-watcher\extension
 
 # Install dependencies
 npm install
@@ -177,13 +177,13 @@ Located in `scripts/`:
 .\install.ps1 -Uninstall
 
 # Or manually
-antigravity --uninstall-extension jethro.claude-input-watcher
+antigravity --uninstall-extension claude-input-watcher
 ```
 
 ## Development
 
 ```powershell
-cd C:\Users\Jethro\Scripts\claude-input-watcher\extension
+cd \claude-input-watcher\extension
 
 # Watch mode for development
 npm run watch
