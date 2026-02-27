@@ -25,7 +25,69 @@ When Claude finishes processing:
 - [Node.js](https://nodejs.org/) installed with `npm` in PATH
 - Windows 10/11 (uses Windows-specific APIs)
 
-### One-Click Install
+### Step 1: Add Claude Code Hooks
+
+The extension is triggered by Claude Code hooks. Add the following `hooks` section to `~/.claude/settings.json`:
+
+```json
+"hooks": {
+  "PreToolUse": [
+    {
+      "matcher": "AskUserQuestion",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\pause-and-focus.ps1\""
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "AskUserQuestion",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\resume.ps1\""
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\resume.ps1\""
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\pause-and-focus.ps1\""
+        }
+      ]
+    }
+  ]
+}
+```
+
+| Hook | Trigger | Script |
+|------|---------|--------|
+| `PreToolUse: AskUserQuestion` | Claude asks a question | `pause-and-focus.ps1` |
+| `PostToolUse: AskUserQuestion` | User answers | `resume.ps1` |
+| `UserPromptSubmit` | User sends any message | `resume.ps1` |
+| `Stop` | Claude finishes responding | `pause-and-focus.ps1` |
+
+> **Note:** Update the script paths in the hook commands if you cloned this repo to a different location.
+
+### Step 2: Install the Antigravity Extension
+
+#### One-Click Install
 
 ```powershell
 # Navigate to the extension folder
@@ -35,7 +97,7 @@ cd \claude-input-watcher
 .\install.ps1
 ```
 
-### Manual Install
+#### Manual Install
 
 ```powershell
 cd \claude-input-watcher\extension
