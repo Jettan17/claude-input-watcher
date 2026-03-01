@@ -37,7 +37,8 @@ The extension is triggered by Claude Code hooks. Add the following `hooks` secti
       "hooks": [
         {
           "type": "command",
-          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\pause-and-focus.ps1\""
+          "command": "/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\path\\to\\claude-input-watcher\\scripts\\pause-and-focus.ps1\"",
+          "async": true
         }
       ]
     }
@@ -48,7 +49,8 @@ The extension is triggered by Claude Code hooks. Add the following `hooks` secti
       "hooks": [
         {
           "type": "command",
-          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\resume.ps1\""
+          "command": "/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\path\\to\\claude-input-watcher\\scripts\\resume.ps1\"",
+          "async": true
         }
       ]
     }
@@ -58,7 +60,8 @@ The extension is triggered by Claude Code hooks. Add the following `hooks` secti
       "hooks": [
         {
           "type": "command",
-          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\resume.ps1\""
+          "command": "/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\path\\to\\claude-input-watcher\\scripts\\resume.ps1\"",
+          "async": true
         }
       ]
     }
@@ -68,7 +71,8 @@ The extension is triggered by Claude Code hooks. Add the following `hooks` secti
       "hooks": [
         {
           "type": "command",
-          "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\path\\to\\claude-input-watcher\\scripts\\pause-and-focus.ps1\""
+          "command": "/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\path\\to\\claude-input-watcher\\scripts\\pause-and-focus.ps1\"",
+          "async": true
         }
       ]
     }
@@ -83,7 +87,7 @@ The extension is triggered by Claude Code hooks. Add the following `hooks` secti
 | `UserPromptSubmit` | User sends any message | `resume.ps1` |
 | `Stop` | Claude finishes responding | `pause-and-focus.ps1` |
 
-> **Note:** Update the script paths in the hook commands if you cloned this repo to a different location.
+> **Important:** The full path `/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe` is required. Claude Code executes hooks via bash, which does not include PowerShell in its PATH — bare `powershell` or `powershell.exe` will silently fail. Replace `C:\\path\\to\\claude-input-watcher` with the actual path where you cloned this repo.
 
 ### Step 2: Install the Antigravity Extension
 
@@ -211,6 +215,13 @@ Located in `scripts/`:
 - **state.json**: Temporarily stores previous window handle (auto-cleaned)
 
 ## Troubleshooting
+
+### Hooks not firing / scripts not running
+Claude Code runs hooks via bash, which does not inherit the Windows system PATH. Using bare `powershell` or `powershell.exe` in hook commands will fail silently with `command not found`. Always use the full path:
+```
+/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+```
+You can confirm hooks are working by checking Claude Code's debug log at `~/.claude/debug/<session-id>.txt` and searching for `Hook.*error`.
 
 ### Extension not activating
 1. Restart Antigravity after installation
