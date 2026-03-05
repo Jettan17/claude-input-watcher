@@ -82,76 +82,6 @@ $alternativeFound = $false
 if ($currentProcess -and $currentProcess.ProcessName -eq "Antigravity") {
     Write-Host "[Claude Watcher] Current window is Antigravity - finding alternative..."
 
-    # Function to check if a process is likely a game
-    function Test-IsGame {
-        param([System.Diagnostics.Process]$proc)
-
-        try {
-            $path = $proc.Path
-            if (-not $path) { return $false }
-
-            # Check if running from game directories
-            $gamePaths = @(
-                "Steam\steamapps\common",
-                "Epic Games",
-                "GOG Galaxy\Games",
-                "Riot Games",
-                "Blizzard",
-                "Origin Games",
-                "Ubisoft Game Launcher",
-                "Xbox Games",
-                "EA Games",
-                "Modrinth"
-            )
-
-            foreach ($gamePath in $gamePaths) {
-                if ($path -match [regex]::Escape($gamePath)) {
-                    return $true
-                }
-            }
-
-            # Check file description/product name for game indicators
-            $fileInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($path)
-            $gameKeywords = @("game", "unity", "unreal", "godot", "cryengine")
-            foreach ($keyword in $gameKeywords) {
-                if ($fileInfo.FileDescription -match $keyword -or
-                    $fileInfo.ProductName -match $keyword -or
-                    $fileInfo.CompanyName -match $keyword) {
-                    return $true
-                }
-            }
-        } catch {
-            # Ignore access errors
-        }
-
-        return $false
-    }
-
-    # Known game processes (your installed games + common ones)
-    $gameProcesses = @(
-        # Your Steam games
-        "Celeste", "HollowKnight", "hollow_knight",
-        "Inscryption", "NMS", "No Man's Sky",
-        "OMORI", "OuterWilds", "portal", "portal2",
-        "RainWorld", "Rain World", "Slay the Princess",
-        "Talos", "TheWitness", "witness",
-        # Minecraft (Modrinth/vanilla)
-        "javaw", "java", "Minecraft",
-        # Common launchers & games
-        "steam", "steamwebhelper",
-        "EpicGamesLauncher", "FortniteClient-Win64-Shipping",
-        "RocketLeague", "csgo", "cs2",
-        "valorant", "VALORANT-Win64-Shipping", "RiotClientServices",
-        "GTA5", "RDR2", "Cyberpunk2077",
-        "Overwatch", "Diablo IV", "WorldOfWarcraft", "Battle.net",
-        "LeagueClient", "League of Legends",
-        "destiny2", "Warframe.x64",
-        "eldenring", "darksouls", "sekiro",
-        "baldursgate3", "bg3",
-        # Entertainment apps
-        "Spotify", "Discord"
-    )
-
     # Browser processes
     $browserProcesses = @(
         "chrome", "firefox", "msedge", "opera", "brave", "vivaldi", "arc"
@@ -171,39 +101,17 @@ if ($currentProcess -and $currentProcess.ProcessName -eq "Antigravity") {
         $excludeProcesses -notcontains $_.ProcessName
     }
 
-    # Method 1: Find by known game process names
-    $gameWindow = $allWindows | Where-Object {
-        $gameProcesses -contains $_.ProcessName
+    # Try browser
+    $browserWindow = $allWindows | Where-Object {
+        $browserProcesses -contains $_.ProcessName
     } | Select-Object -First 1
 
-    # Method 2: If not found, check by path (Steam/Epic/etc directories)
-    if (-not $gameWindow) {
-        $gameWindow = $allWindows | Where-Object {
-            Test-IsGame $_
-        } | Select-Object -First 1
-    }
-
-    if ($gameWindow) {
-        $previousWindow = $gameWindow.MainWindowHandle
+    if ($browserWindow) {
+        $previousWindow = $browserWindow.MainWindowHandle
         $wasMaximized = [Win32]::IsZoomed($previousWindow)
         $wasMinimized = [Win32]::IsIconic($previousWindow)
         $alternativeFound = $true
-        Write-Host "[Claude Watcher] Found game/entertainment: $($gameWindow.ProcessName) ($($gameWindow.MainWindowTitle))"
-    }
-
-    # If no game, try browser
-    if (-not $alternativeFound) {
-        $browserWindow = $allWindows | Where-Object {
-            $browserProcesses -contains $_.ProcessName
-        } | Select-Object -First 1
-
-        if ($browserWindow) {
-            $previousWindow = $browserWindow.MainWindowHandle
-            $wasMaximized = [Win32]::IsZoomed($previousWindow)
-            $wasMinimized = [Win32]::IsIconic($previousWindow)
-            $alternativeFound = $true
-            Write-Host "[Claude Watcher] Found browser: $($browserWindow.ProcessName) ($($browserWindow.MainWindowTitle))"
-        }
+        Write-Host "[Claude Watcher] Found browser: $($browserWindow.ProcessName) ($($browserWindow.MainWindowTitle))"
     }
 
     # If nothing found, we'll minimize to desktop on resume

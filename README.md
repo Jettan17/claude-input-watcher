@@ -12,7 +12,7 @@ When Claude asks a question or requires input:
 
 When you respond:
 1. **Resumes media playback** automatically
-2. **Restores focus** to your previous window (game, browser, etc.)
+2. **Restores focus** to your previous window (browser, etc.)
 
 When Claude finishes processing:
 1. **Pauses media again** (ready for your next prompt)
@@ -236,7 +236,7 @@ You can confirm hooks are working by checking Claude Code's debug log at `~/.cla
 ### Focus not restoring
 1. Windows may block focus changes from background apps
 2. Check if the previous window still exists
-3. Games in exclusive fullscreen may not respond to focus changes
+
 
 ### Notification sound not playing
 1. Check Windows sound settings
@@ -268,7 +268,6 @@ npm run watch
 
 - **Windows only**: Uses Windows-specific APIs (user32.dll, Windows.Media.Control)
 - **Antigravity only**: Extension is specific to Antigravity IDE (VS Code fork)
-- **Games**: No universal pause API - relies on games auto-pausing on focus loss
 - **Fullscreen apps**: Some fullscreen apps may block focus changes
 
 ## License
