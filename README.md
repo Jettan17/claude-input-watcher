@@ -1,12 +1,12 @@
 # Claude Input Watcher
 
-An Antigravity IDE extension that pauses your media and brings the IDE to the foreground when Claude Code requires input.
+A VS Code extension that pauses your media and brings the IDE to the foreground when Claude Code requires input.
 
 ## Features
 
 When Claude asks a question or requires input:
 1. **Pauses all media** (YouTube, Spotify, etc.) using Windows Media API
-2. **Brings Antigravity to foreground** so you can respond
+2. **Brings VS Code to foreground** so you can respond
 3. **Plays a notification sound** to get your attention
 4. **Flashes taskbar** if focus change is blocked
 
@@ -16,12 +16,12 @@ When you respond:
 
 When Claude finishes processing:
 1. **Pauses media again** (ready for your next prompt)
-2. **Brings Antigravity back** to the foreground
+2. **Brings VS Code back** to the foreground
 
 ## Installation
 
 ### Prerequisites
-- [Antigravity IDE](https://antigravity.dev) installed with `antigravity` in PATH
+- [VS Code](https://code.visualstudio.com/) (1.93+) installed with `code` in PATH
 - [Node.js](https://nodejs.org/) installed with `npm` in PATH
 - Windows 10/11 (uses Windows-specific APIs)
 
@@ -89,7 +89,7 @@ The extension is triggered by Claude Code hooks. Add the following `hooks` secti
 
 > **Important:** The full path `/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe` is required. Claude Code executes hooks via bash, which does not include PowerShell in its PATH — bare `powershell` or `powershell.exe` will silently fail. Replace `C:\\path\\to\\claude-input-watcher` with the actual path where you cloned this repo.
 
-### Step 2: Install the Antigravity Extension
+### Step 2: Install the VS Code Extension
 
 #### One-Click Install
 
@@ -115,13 +115,13 @@ npm run compile
 # Package extension
 npx vsce package --allow-missing-repository
 
-# Install in Antigravity
-antigravity --install-extension claude-input-watcher-1.0.0.vsix
+# Install in VS Code
+code --install-extension claude-input-watcher-1.0.0.vsix
 ```
 
 ## Usage
 
-The extension activates automatically when Antigravity starts.
+The extension activates automatically when VS Code starts.
 
 ### Commands
 
@@ -210,7 +210,7 @@ The extension watches terminal output for these patterns:
 
 Located in `scripts/`:
 
-- **pause-and-focus.ps1**: Saves current window, pauses media, focuses Antigravity, plays sound
+- **pause-and-focus.ps1**: Saves current window, pauses media, focuses VS Code, plays sound
 - **resume.ps1**: Resumes media, restores previous window focus
 - **state.json**: Temporarily stores previous window handle (auto-cleaned)
 
@@ -224,7 +224,7 @@ Claude Code runs hooks via bash, which does not inherit the Windows system PATH.
 You can confirm hooks are working by checking Claude Code's debug log at `~/.claude/debug/<session-id>.txt` and searching for `Hook.*error`.
 
 ### Extension not activating
-1. Restart Antigravity after installation
+1. Restart VS Code after installation
 2. Check Output panel (View > Output > Claude Watcher)
 3. Verify scripts path in settings
 
@@ -250,7 +250,7 @@ You can confirm hooks are working by checking Claude Code's debug log at `~/.cla
 .\install.ps1 -Uninstall
 
 # Or manually
-antigravity --uninstall-extension claude-input-watcher
+code --uninstall-extension claude-input-watcher
 ```
 
 ## Development
@@ -261,13 +261,13 @@ cd \claude-input-watcher\extension
 # Watch mode for development
 npm run watch
 
-# In another terminal, press F5 in Antigravity to launch Extension Development Host
+# In another terminal, press F5 in VS Code to launch Extension Development Host
 ```
 
 ## Limitations
 
 - **Windows only**: Uses Windows-specific APIs (user32.dll, Windows.Media.Control)
-- **Antigravity only**: Extension is specific to Antigravity IDE (VS Code fork)
+- **VS Code 1.93+**: Requires `onDidWriteTerminalData` API
 - **Fullscreen apps**: Some fullscreen apps may block focus changes
 
 ## License

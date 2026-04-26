@@ -1,8 +1,8 @@
 {
   "name": "claude-input-watcher",
   "displayName": "Claude Input Watcher",
-  "description": "Pauses media and brings Antigravity to focus when Claude Code requires input",
-  "version": "1.0.0",
+  "description": "Pauses media and brings VS Code to focus when Claude Code requires input",
+  "version": "2.0.0",
   "publisher": "jethro",
   "engines": {
     "vscode": "^1.85.0"

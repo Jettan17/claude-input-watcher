@@ -1,6 +1,6 @@
 # Claude Input Watcher Extension
 
-VS Code extension for Antigravity IDE that monitors Claude Code terminal output and triggers media pause/focus when input is required.
+VS Code extension that monitors Claude Code terminal output and triggers media pause/focus when input is required.
 
 ## Development
 
