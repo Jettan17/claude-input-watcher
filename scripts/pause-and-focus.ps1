@@ -1,4 +1,4 @@
-# pause-and-focus.ps1 - Pause media, save state, focus & maximize Antigravity
+# pause-and-focus.ps1 - Pause media, save state, focus & maximize VS Code
 # Called when Claude requires input (question prompts, confirmations, etc.)
 
 param(
@@ -73,14 +73,14 @@ $currentProcessId = 0
 [Win32]::GetWindowThreadProcessId($currentWindow, [ref]$currentProcessId) | Out-Null
 $currentProcess = Get-Process -Id $currentProcessId -ErrorAction SilentlyContinue
 
-# Check if current window is Antigravity - if so, find an alternative
+# Check if current window is VS Code - if so, find an alternative
 $previousWindow = $currentWindow
 $wasMaximized = [Win32]::IsZoomed($currentWindow)
 $wasMinimized = [Win32]::IsIconic($currentWindow)
 $alternativeFound = $false
 
-if ($currentProcess -and $currentProcess.ProcessName -eq "Antigravity") {
-    Write-Host "[Claude Watcher] Current window is Antigravity - finding alternative..."
+if ($currentProcess -and $currentProcess.ProcessName -eq "Code") {
+    Write-Host "[Claude Watcher] Current window is VS Code - finding alternative..."
 
     # Browser processes
     $browserProcesses = @(
@@ -89,7 +89,7 @@ if ($currentProcess -and $currentProcess.ProcessName -eq "Antigravity") {
 
     # Exclude these from alternatives (IDEs, terminals, system)
     $excludeProcesses = @(
-        "Antigravity", "Code", "cursor", "WindowsTerminal", "cmd", "powershell",
+        "Code", "Antigravity", "cursor", "WindowsTerminal", "cmd", "powershell",
         "explorer", "SearchHost", "StartMenuExperienceHost", "ShellExperienceHost",
         "TextInputHost", "SystemSettings", "ApplicationFrameHost"
     )
@@ -200,7 +200,7 @@ $stateData = @{
     previousWindowHandle = $previousWindow.ToInt64()
     wasMaximized = $wasMaximized
     wasMinimized = $wasMinimized
-    useDesktop = (-not $alternativeFound -and $currentProcess.ProcessName -eq "Antigravity")
+    useDesktop = (-not $alternativeFound -and $currentProcess.ProcessName -eq "Code")
     wasOnMediaWindow = $wasOnMediaWindow
     mediaProcessNames = $mediaProcessNames
     previousProcessName = $previousProcessName
@@ -216,16 +216,16 @@ if ($alternativeFound) {
     Write-Host "[Claude Watcher] Saving previous window: $($previousWindow.ToInt64()) (maximized: $wasMaximized, onMedia: $wasOnMediaWindow)"
 }
 
-# Bring Antigravity to foreground and maximize
-$antigravity = Get-Process -Name "Antigravity" -ErrorAction SilentlyContinue |
-               Where-Object { $_.MainWindowHandle -ne 0 } |
-               Select-Object -First 1
+# Bring VS Code to foreground and maximize
+$vscode = Get-Process -Name "Code" -ErrorAction SilentlyContinue |
+          Where-Object { $_.MainWindowHandle -ne 0 } |
+          Select-Object -First 1
 
-if ($antigravity) {
-    $hwnd = $antigravity.MainWindowHandle
-    $processId = $antigravity.Id
+if ($vscode) {
+    $hwnd = $vscode.MainWindowHandle
+    $processId = $vscode.Id
 
-    Write-Host "[Claude Watcher] Found Antigravity (PID: $processId, HWND: $hwnd)"
+    Write-Host "[Claude Watcher] Found VS Code (PID: $processId, HWND: $hwnd)"
 
     # Restore if minimized
     if ([Win32]::IsIconic($hwnd)) {
@@ -246,7 +246,7 @@ if ($antigravity) {
     # Method 2: If AppActivate failed, try by window title
     if (-not $focused -or [Win32]::GetForegroundWindow() -ne $hwnd) {
         try {
-            [Microsoft.VisualBasic.Interaction]::AppActivate("Antigravity")
+            [Microsoft.VisualBasic.Interaction]::AppActivate("Visual Studio Code")
             Write-Host "[Claude Watcher] AppActivate by title succeeded"
             $focused = $true
         } catch {
@@ -266,17 +266,17 @@ if ($antigravity) {
     # Maximize window unless -NoMaximize specified
     if (-not $NoMaximize) {
         [Win32]::ShowWindow($hwnd, [Win32]::SW_MAXIMIZE) | Out-Null
-        Write-Host "[Claude Watcher] Maximized Antigravity window"
+        Write-Host "[Claude Watcher] Maximized VS Code window"
     }
 
     # Final check
     if ([Win32]::GetForegroundWindow() -eq $hwnd) {
-        Write-Host "[Claude Watcher] SUCCESS: Antigravity is now focused"
+        Write-Host "[Claude Watcher] SUCCESS: VS Code is now focused"
     } else {
         Write-Host "[Claude Watcher] WARNING: Focus may not have switched completely"
     }
 } else {
-    Write-Host "[Claude Watcher] Antigravity process not found"
+    Write-Host "[Claude Watcher] VS Code process not found"
 }
 
 # Play notification sound

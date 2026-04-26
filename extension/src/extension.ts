@@ -35,12 +35,11 @@ const INPUT_REQUIRED_PATTERNS = [
 const PROMPT_READY_PATTERN = /^>\s*$/m;
 
 // Patterns that indicate an AskUserQuestion answer was submitted
-// These detect terminal clearing/rewriting and answer echoing
+// Only use content-specific patterns — ANSI codes (clear line, cursor up) fire on
+// every ink re-render and cause premature resume before the user actually answers.
 const ANSWER_SUBMITTED_PATTERNS = [
-    /\x1b\[2K/,                    // ANSI: Clear entire line (question UI cleared)
-    /\x1b\[\d*A/,                  // ANSI: Cursor up (redrawing after selection)
-    /\x1b\[\d*J/,                  // ANSI: Clear screen/below (UI cleanup)
     /✓/,                           // Checkmark (selection confirmed)
+    /✔/,                           // Heavy checkmark variant
     /›/,                           // Right chevron (selection indicator)
     /^[A-Z][a-z].*\(Recommended\)/m, // Selected recommended option echoed
 ];
@@ -54,17 +53,9 @@ const PROCESSING_INDICATORS = [
     /\u2022/,      // • Bullet point
     /\u00B7/,      // · Middle dot
     /\u2026/,      // … Ellipsis
-    /\.{3,}/,      // Three or more dots
-    // Status text
+    // Status text (specific to Claude Code, unlikely from dev servers)
     /Thinking/i,
     /Processing/i,
-    /Working/i,
-    // Claude Code specific patterns
-    /Reading/i,
-    /Writing/i,
-    /Running/i,
-    /Searching/i,
-    /Editing/i,
 ];
 
 let state: WatcherState = 'idle';
@@ -286,6 +277,15 @@ function processTerminalData(data: string, debounceMs: number) {
             else if (matchesAnswerSubmitted(data)) {
                 log(`State: waiting_input -> processing (detected answer submission: "${truncate(data, 50)}")`);
                 state = 'processing';
+                lastTriggerTime = now;
+                executeResume();
+                updateStatusBar();
+            }
+            // Check if prompt reappeared — means the answer was submitted and Claude
+            // already finished processing (we missed the processing transition)
+            else if (PROMPT_READY_PATTERN.test(data)) {
+                log(`State: waiting_input -> idle (prompt ready - missed processing phase)`);
+                state = 'idle';
                 lastTriggerTime = now;
                 executeResume();
                 updateStatusBar();
